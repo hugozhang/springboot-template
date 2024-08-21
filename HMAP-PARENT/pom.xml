@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.9</version>
+    </parent>
+
+    <groupId>com.winning.hmap</groupId>
+    <artifactId>hmap-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+   <dependencyManagement>
+       <dependencies>
+           <!-- start 业务依赖包   -->
+           <dependency>
+               <groupId>com.winning.hmap</groupId>
+               <artifactId>hmap-portal</artifactId>
+               <version>1.0.0-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.winning.hmap</groupId>
+               <artifactId>hmap-supervise</artifactId>
+               <version>1.0.0-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.winning.hmap</groupId>
+               <artifactId>hmap-appeal</artifactId>
+               <version>1.0.0-SNAPSHOT</version>
+           </dependency>
+
+           <!-- google guava 工具包-->
+           <dependency>
+               <groupId>com.google.guava</groupId>
+               <artifactId>guava</artifactId>
+               <version>18.0</version>
+           </dependency>
+
+           <dependency>
+               <groupId>commons-collections</groupId>
+               <artifactId>commons-collections</artifactId>
+               <version>3.2.2</version>
+           </dependency>
+
+           <dependency>
+               <groupId>commons-io</groupId>
+               <artifactId>commons-io</artifactId>
+               <version>1.4</version>
+           </dependency>
+
+           <dependency>
+               <groupId>commons-fileupload</groupId>
+               <artifactId>commons-fileupload</artifactId>
+               <version>1.3.1</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.alibaba</groupId>
+               <artifactId>fastjson</artifactId>
+               <version>1.2.83</version>
+           </dependency>
+
+           <dependency>
+               <groupId>org.hibernate</groupId>
+               <artifactId>hibernate-validator</artifactId>
+               <version>5.1.3.Final</version>
+           </dependency>
+
+           <dependency>
+               <groupId>org.mybatis</groupId>
+               <artifactId>mybatis</artifactId>
+               <version>3.5.6</version>
+           </dependency>
+
+           <dependency>
+               <groupId>org.projectlombok</groupId>
+               <artifactId>lombok</artifactId>
+               <version>1.18.20</version>
+               <scope>provided</scope>
+           </dependency>
+
+           <dependency>
+               <groupId>mysql</groupId>
+               <artifactId>mysql-connector-java</artifactId>
+               <version>8.0.33</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.alibaba</groupId>
+               <artifactId>druid</artifactId>
+               <version>1.2.5</version>
+           </dependency>
+
+           <dependency>
+               <groupId>de.schlichtherle.truelicense</groupId>
+               <artifactId>truelicense-core</artifactId>
+               <version>1.33</version>
+           </dependency>
+
+           <dependency>
+               <groupId>io.springfox</groupId>
+               <artifactId>springfox-boot-starter</artifactId>
+               <version>3.0.0</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-spring</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-excel</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-mybatis</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-cache</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-dict</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-http</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-oss</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>me.about</groupId>
+               <artifactId>easy-widget-config</artifactId>
+               <version>1.0.7-SNAPSHOT</version>
+           </dependency>
+
+           <dependency>
+               <groupId>io.swagger.core.v3</groupId>
+               <artifactId>swagger-annotations</artifactId>
+               <version>2.1.2</version>
+           </dependency>
+
+           <dependency>
+               <groupId>io.swagger</groupId>
+               <artifactId>swagger-annotations</artifactId>
+               <version>1.6.9</version>
+           </dependency>
+
+           <dependency>
+               <groupId>io.springfox</groupId>
+               <artifactId>springfox-core</artifactId>
+               <version>3.0.0</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.github.pagehelper</groupId>
+               <artifactId>pagehelper</artifactId>
+               <version>5.2.0</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.cronutils</groupId>
+               <artifactId>cron-utils</artifactId>
+               <version>9.1.5</version>
+           </dependency>
+
+           <dependency>
+               <groupId>org.quartz-scheduler</groupId>
+               <artifactId>quartz</artifactId>
+               <version>2.2.1</version>
+           </dependency>
+
+           <dependency>
+               <groupId>pentaho-kettle</groupId>
+               <artifactId>kettle-core</artifactId>
+               <version>8.0.0.0-28</version>
+           </dependency>
+
+           <dependency>
+               <groupId>pentaho-kettle</groupId>
+               <artifactId>kettle-dbdialog</artifactId>
+               <version>8.0.0.0-28</version>
+           </dependency>
+
+           <dependency>
+               <groupId>pentaho-kettle</groupId>
+               <artifactId>kettle-engine</artifactId>
+               <version>8.0.0.0-28</version>
+           </dependency>
+
+           <dependency>
+               <groupId>pentaho</groupId>
+               <artifactId>metastore</artifactId>
+               <version>8.0.0.0-28</version>
+           </dependency>
+
+           <dependency>
+               <groupId>cn.hutool</groupId>
+               <artifactId>hutool-all</artifactId>
+               <version>5.0.7</version>
+           </dependency>
+
+           <dependency>
+               <groupId>org.codehaus.jackson</groupId>
+               <artifactId>jackson-core-asl</artifactId>
+               <version>1.9.13</version>
+           </dependency>
+
+           <dependency>
+               <groupId>org.codehaus.jackson</groupId>
+               <artifactId>jackson-mapper-asl</artifactId>
+               <version>1.9.13</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.github.ben-manes.caffeine</groupId>
+               <artifactId>caffeine</artifactId>
+               <version>2.9.2</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.squareup.retrofit2</groupId>
+               <artifactId>retrofit</artifactId>
+               <version>2.3.0</version>
+           </dependency>
+
+           <!-- mapstruct 引入依赖 -->
+           <dependency>
+               <groupId>org.projectlombok</groupId>
+               <artifactId>lombok</artifactId>
+               <version>1.18.20</version>
+               <scope>provided</scope>
+           </dependency>
+           <dependency>
+               <groupId>org.mapstruct</groupId>
+               <artifactId>mapstruct</artifactId>
+               <version>1.4.2.Final</version>
+           </dependency>
+           <dependency>
+               <groupId>org.mapstruct</groupId>
+               <artifactId>mapstruct-processor</artifactId>
+               <version>1.4.2.Final</version>
+               <scope>provided</scope>
+           </dependency>
+
+           <dependency>
+               <groupId>org.apache.httpcomponents</groupId>
+               <artifactId>httpmime</artifactId>
+               <version>4.3</version>
+           </dependency>
+
+           <dependency>
+               <groupId>log4j</groupId>
+               <artifactId>log4j</artifactId>
+               <version>1.2.16</version>
+           </dependency>
+       </dependencies>
+   </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>http://192.168.3.103:8081/nexus/content/repositories/winning-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://192.168.3.103:8081/nexus/content/repositories/winning-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+</project>

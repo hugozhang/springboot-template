@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysMedinsDeptMapper">
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.auth.entity.SysMedinsDept" useGeneratedKeys="true">
+        insert into sys_medins_dept (id, dept_name, dept_code,hi_dept_name, hi_dept_code,
+                                     medins_id, parent_id, del_flag,
+                                     crte_time, crter_id, updt_time,
+                                     updtr_id)
+        values (#{id,jdbcType=BIGINT}, #{deptName,jdbcType=VARCHAR}, #{deptCode,jdbcType=VARCHAR},
+                #{hiDeptName,jdbcType=VARCHAR}, #{hiDeptCode,jdbcType=VARCHAR},
+                #{medinsId,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{delFlag,jdbcType=CHAR},
+                #{crteTime,jdbcType=TIMESTAMP}, #{crterId,jdbcType=BIGINT}, #{updtTime,jdbcType=TIMESTAMP},
+                #{updtrId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        update sys_medins_dept
+        <set>
+            <if test="deptName != null">
+                dept_name = #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="deptCode != null">
+                dept_code = #{deptCode,jdbcType=VARCHAR},
+            </if>
+            <if test="hiDeptName != null">
+                hi_dept_name = #{hiDeptName,jdbcType=VARCHAR},
+            </if>
+            <if test="hiDeptCode != null">
+                hi_dept_code = #{hiDeptCode,jdbcType=VARCHAR},
+            </if>
+            <if test="medinsId != null">
+                medins_id = #{medinsId,jdbcType=BIGINT},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=CHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crterId != null">
+                crter_id = #{crterId,jdbcType=BIGINT},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updtrId != null">
+                updtr_id = #{updtrId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="disable">
+        update sys_medins_dept
+        set del_flag = '1'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="enable">
+        update sys_medins_dept
+        set del_flag = '0'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="getMedinsDeptById" resultType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        <![CDATA[
+        SELECT
+            id,
+            dept_name,
+            dept_code,
+            parent_id,
+            hi_dept_name,
+            hi_dept_code,
+            medins_id,
+            del_flag
+        FROM
+            sys_medins_dept
+        WHERE
+            id = #{id,jdbcType=BIGINT}
+        ]]>
+    </select>
+
+    <select id="getMedinsDeptByCode" resultType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        <![CDATA[
+        SELECT
+            id,
+            dept_name,
+            dept_code,
+            parent_id,
+            hi_dept_name,
+            hi_dept_code,
+            del_flag
+        FROM
+            sys_medins_dept
+        WHERE
+            dept_code = #{deptCode,jdbcType=VARCHAR}
+        ]]>
+    </select>
+
+    <select id="selectByPage" resultType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        <![CDATA[
+        SELECT
+            id,
+            dept_name,
+            dept_code,
+            hi_dept_name,
+            hi_dept_code,
+            parent_id,
+            del_flag
+        FROM
+            sys_medins_dept
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.deptName != null and paramObj.deptName != ''">
+                    AND (dept_name LIKE concat('%',#{paramObj.deptName},'%') OR dept_code LIKE concat('%',#{paramObj.deptName},'%'))
+                </if>
+                <if test="paramObj.hiDeptName != null and paramObj.hiDeptName != ''">
+                    AND (hi_dept_name LIKE concat('%',#{paramObj.hiDeptName},'%') OR hi_dept_code LIKE concat('%',#{paramObj.hiDeptName},'%'))
+                </if>
+                <if test="paramObj.delFlag != null and paramObj.delFlag != ''">
+                    AND del_flag = #{paramObj.delFlag}
+                </if>
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <!-- wg  -->
+    <select id="findMedinsDeptList" parameterType="com.winning.hmap.portal.auth.dto.auth.req.query.MedinsDeptParam" resultType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        <![CDATA[
+        SELECT distinct
+            a.id,
+            a.dept_name,
+            a.dept_code,
+            a.dept_name name,
+            a.dept_name label,
+            a.id code,
+            a.hi_dept_name,
+            a.hi_dept_code,
+            a.parent_id
+        FROM
+            sys_medins_dept a LEFT JOIN sys_medins_dept_doctor b on a.id = b.medins_dept_id
+        ]]>
+        <where>
+            del_flag = "0"
+            <if test="drId != null and drId != ''">
+                AND b.dr_id = #{drId,jdbcType=BIGINT}
+            </if>
+            <if test="deptName != null and deptName != ''">
+                AND a.dept_name = #{deptName,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
+
+    <select id="medinsDeptIdList" resultType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        <![CDATA[
+        SELECT DISTINCT
+            a.id,
+            a.dept_name,
+            a.dept_code,
+            a.hi_dept_name,
+            a.hi_dept_code,
+            a.medins_id,
+            b.medins_no
+        FROM
+            sys_medins_dept a
+        INNER JOIN sys_medins b ON a.medins_id = b.id
+        ]]>
+        <where>
+            a.del_flag = 0 and b.del_flag = 0
+        </where>
+    </select>
+
+    <insert id="insertDeptList" parameterType="com.winning.hmap.portal.auth.entity.SysMedinsDept" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_medins_dept(dept_code,dept_name,hi_dept_code,hi_dept_name,medins_id,parent_id,del_flag,crte_time,crter_id) values
+        <foreach collection="list" item="item" open="(" close=")" separator="),(">
+            #{item.deptCode},
+            #{item.deptName},
+            #{item.hiDeptCode},
+            #{item.hiDeptName},
+            #{item.medinsId},
+            #{item.parentId},
+            #{item.delFlag},
+            #{item.crteTime},
+            #{item.crterId}
+        </foreach>
+    </insert>
+
+    <update id="updateDeptDtos" useGeneratedKeys="true" keyProperty="id">
+        <foreach collection="list" item="item" separator=";">
+            update sys_medins_dept
+            SET dept_name=#{item.deptName},
+            hi_dept_code=#{item.hiDeptCode},
+            hi_dept_name=#{item.hiDeptName},
+            parent_id=#{item.parentId},
+            updt_time=#{item.updtTime},
+            updtr_id=#{item.updtrId}
+            where dept_code=#{item.deptCode}
+        </foreach>
+    </update>
+
+    <update id="updateDepts" >
+        <foreach collection="list" item="item" separator=";">
+            update sys_medins_dept
+            SET parent_id=#{item.parentId}
+            where dept_code=#{item.deptCode}
+        </foreach>
+    </update>
+
+    <!-- 查询科室下对应医疗组 -->
+    <select id="queryMedGrpByDeptCodes" parameterType="java.util.List" resultType="com.winning.hmap.portal.auth.entity.SysMedGrp">
+        <foreach collection="list" item="item" index="index" separator="union">
+            SELECT
+            t1.id id ,
+            t1.id code,
+            t1.med_grp_name label
+            FROM
+            sys_med_grp t1
+        </foreach>
+    </select>
+
+    <select id="queryDeptList" parameterType="com.winning.hmap.portal.auth.entity.SysMedinsDept" resultType="com.winning.hmap.portal.auth.entity.SysMedinsDept">
+        SELECT DISTINCT
+        a.dept_name label,
+        a.id code
+        FROM
+        sys_medins_dept a
+        <where>
+            <if test="deptName!=null and deptName!=''">
+                and (a.dept_name like concat('%',#{deptName},'%') or a.dept_code like concat('%',#{deptName},'%'))
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

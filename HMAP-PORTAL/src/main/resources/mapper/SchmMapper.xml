@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.task.mapper.SchmMapper">
+
+    <select id="selectByPrimaryKey" resultType="com.winning.hmap.portal.task.entity.Schm">
+        select
+            id,
+            name,
+            type,
+            impl,
+            dscr,
+            para,
+            crter_id,
+            crte_time,
+            updtr_id,
+            updt_time,
+            del_flag,
+            att_uuid,
+            vali_flag
+        from task_schm
+        where id = #{id}
+    </select>
+
+    <select id="taskSchmList" resultType="com.winning.hmap.portal.task.entity.Schm">
+        SELECT
+            p.id,
+            p.name,
+            p.type,
+            p.impl,
+            p.dscr,
+            p.para,
+            u.username updtrName,
+            p.updtr_id,
+            p.updt_time,
+            p.del_flag,
+            p.vali_flag,
+            p.att_uuid
+        FROM task_schm p
+        LEFT JOIN sys_user u ON p.updtr_id=u.id
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.schmName != null and paramObj.schmName != ''">
+                    AND p.name like concat('%',#{paramObj.schmName},'%')
+                </if>
+                <if test="paramObj.schmType != null and paramObj.schmType != ''">
+                    AND p.type = #{paramObj.schmType,jdbcType=VARCHAR}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.task.dto.req.put.SchmParam" useGeneratedKeys="true">
+        insert into task_schm
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="name != null">name,</if>
+                <if test="type != null">type,</if>
+                <if test="impl != null">impl,</if>
+                <if test="dscr != null">dscr,</if>
+                <if test="para != null">para,</if>
+                <if test="crterId != null">crter_id,</if>
+                <if test="crteTime != null">crte_time,</if>
+                <if test="attr != null">attr,</if>
+                <if test="delFlag != null">del_flag,</if>
+                <if test="valiFlag != null">vali_flag,</if>
+                <if test="attUuid != null">att_uuid,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="name != null">#{name,jdbcType=VARCHAR},</if>
+                <if test="type != null">#{type,jdbcType=VARCHAR},</if>
+                <if test="impl != null">#{impl,jdbcType=VARCHAR},</if>
+                <if test="dscr != null">#{dscr,jdbcType=VARCHAR},</if>
+                <if test="para != null">#{para,jdbcType=VARCHAR},</if>
+                <if test="crterId != null">#{crterId,jdbcType=VARCHAR},</if>
+                <if test="crteTime != null">#{crteTime,jdbcType=TIMESTAMP},</if>
+                <if test="attr != null">#{attr,jdbcType=VARCHAR},</if>
+                <if test="delFlag != null">#{delFlag,jdbcType=VARCHAR},</if>
+                <if test="valiFlag != null">#{valiFlag,jdbcType=VARCHAR},</if>
+                <if test="attUuid != null">#{attUuid,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.task.entity.Schm">
+        update task_schm
+        set
+            name =  #{name,jdbcType=VARCHAR},
+            type =  #{type,jdbcType=VARCHAR},
+            vali_flag = #{valiFlag,jdbcType=VARCHAR},
+            impl =  #{impl,jdbcType=VARCHAR},
+            dscr =  #{dscr,jdbcType=VARCHAR},
+            para =  #{para,jdbcType=VARCHAR},
+            att_uuid =  #{attUuid,jdbcType=VARCHAR},
+            updtr_id =  #{updtrId,jdbcType=VARCHAR},
+            updt_time =  #{updtTime,jdbcType=TIMESTAMP},
+            del_flag =  #{delFlag,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+
+    <update id="deleteById">
+        UPDATE task_schm
+        SET vali_flag='0'
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateProcedure" statementType="CALLABLE">
+        {call ${procedureName}}
+    </update>
+</mapper>

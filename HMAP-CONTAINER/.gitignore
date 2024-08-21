@@ -1,0 +1,15 @@
+﻿# Created by .ignore support plugin (hsz.mobi)
+/.idea/*
+/logs/
+*.dat
+*.lic
+/*/target/
+/*.iml
+/*/*.iml
+/target/
+/hmap-container/src/main/resources/WebContent/static/
+/hmap-container/src/main/resources/WebContent/pdfJs/
+/hmap-container/src/main/resources/WebContent/favicon.ico
+/hmap-container/src/main/resources/WebContent/index.html
+/hmap-container/src/main/resources/WebContent/test.html
+/static/

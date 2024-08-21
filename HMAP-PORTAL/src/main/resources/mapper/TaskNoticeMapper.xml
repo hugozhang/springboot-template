@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.task.mapper.TaskNoticeMapper">
+
+    <select id="taskNotice" resultType="com.winning.hmap.portal.task.dto.resp.TaskNotice">
+        SELECT
+            count(DISTINCT t1.run_bchno) as noticeNum
+        FROM task_rslt t1
+        where t1.task_stas = '9'
+          AND t1.id not in(select exe_rslt_id from task_rslt_read)
+    </select>
+
+    <insert id="taskFailNotice">
+        INSERT INTO task_rslt_read (exe_rslt_id,user_id,run_bchno)
+        select exeRsltId, #{userId},run_bchno from task_rslt where run_bchno = #{runBchno}
+    </insert>
+</mapper>

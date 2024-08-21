@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.dict.mapper.SysLogMapper">
+
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.dict.entity.SysLog" useGeneratedKeys="true">
+    insert into sys_log (id, opn_type, user_id, 
+      login_name, username, ip,
+      opn_time, content, crte_time, 
+      crter_id, updt_time, updtr_id
+      )
+    values (#{id,jdbcType=BIGINT}, #{opnType,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT}, 
+      #{loginName,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR},
+      #{opnTime,jdbcType=TIMESTAMP}, #{content,jdbcType=VARCHAR}, #{crteTime,jdbcType=TIMESTAMP},
+      #{crterId,jdbcType=BIGINT}, #{updtTime,jdbcType=TIMESTAMP}, #{updtrId,jdbcType=BIGINT}
+      )
+  </insert>
+
+  <select id="selectByPage">
+    <![CDATA[
+        SELECT
+            id,
+            opn_type,
+            user_id,
+            login_name,
+            username,
+            ip,
+            opn_time,
+            content
+        FROM
+            sys_log
+        ]]>
+    <where>
+      <if test="paramObj != null">
+        <if test="paramObj.opnType != null and paramObj.opnType != ''">
+          and opn_type like concat('%',#{paramObj.opnType},'%')
+        </if>
+        <if test="paramObj.username != null and paramObj.username != ''">
+          and (username like concat('%',#{paramObj.username},'%') or login_name like concat('%',#{paramObj.username},'%'))
+        </if>
+        <if test="paramObj.opnTimeStart != null and paramObj.opnTimeStart != ''">
+          and opn_time &gt;= str_to_date(#{paramObj.opnTimeStart},'%Y-%m-%d')
+        </if>
+        <if test="paramObj.opnTimeEnd != null and paramObj.opnTimeEnd != ''">
+          and opn_time &lt; date_add(str_to_date(#{paramObj.opnTimeEnd},'%Y-%m-%d'),interval 1 day)
+        </if>
+      </if>
+    </where>
+    order by id desc
+  </select>
+
+</mapper>

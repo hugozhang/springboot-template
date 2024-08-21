@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.task.mapper.TaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.winning.hmap.portal.task.entity.Task">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="exeExpr" column="exe_expr" jdbcType="VARCHAR"/>
+            <result property="dscr" column="dscr" jdbcType="VARCHAR"/>
+            <result property="valiFlag" column="vali_flag" jdbcType="VARCHAR"/>
+            <result property="taskFlag" column="task_flag" jdbcType="VARCHAR"/>
+            <result property="crterId" column="crter_id" jdbcType="VARCHAR"/>
+            <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+            <result property="updtrId" column="updtr_id" jdbcType="VARCHAR"/>
+            <result property="updtTime" column="updt_time" jdbcType="TIMESTAMP"/>
+            <result property="delFlag" column="del_flag" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,exe_expr,dscr,vali_flag,task_flag,crter_id,crte_time,updtr_id,updt_time,del_flag
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from task
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.task.entity.Task" useGeneratedKeys="true">
+        insert into task(name,exeExpr,dscr,vali_flag,task_flag,crter_id,crte_time,updtr_id,updt_time,del_flag) values
+        (#{name,jdbcType=VARCHAR},#{exeExpr,jdbcType=VARCHAR},#{dscr,jdbcType=VARCHAR},#{valiFlag,jdbcType=VARCHAR},#{taskFlag,jdbcType=VARCHAR}
+        ,#{crterId,jdbcType=VARCHAR},#{crteTime,jdbcType=TIMESTAMP},#{updtrId,jdbcType=VARCHAR},#{updtTime,jdbcType=TIMESTAMP},#{delFlag,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.task.entity.Task" useGeneratedKeys="true">
+        insert into TASK
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="name != null">name,</if>
+                <if test="exeExpr != null">exe_expr,</if>
+                <if test="dscr != null">dscr,</if>
+                <if test="valiFlag != null">vali_flag,</if>
+                <if test="taskFlag != null">task_flag,</if>
+                <if test="crterId != null">crter_id,</if>
+                <if test="crteTime != null">crte_time,</if>
+                <if test="updtrId != null">updtr_id,</if>
+                <if test="updtTime != null">updt_time,</if>
+                <if test="delFlag != null">del_flag,</if>
+                <if test="type != null">type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="name != null">#{name,jdbcType=VARCHAR},</if>
+                <if test="exeExpr != null">#{exeExpr,jdbcType=VARCHAR},</if>
+                <if test="dscr != null">#{dscr,jdbcType=VARCHAR},</if>
+                <if test="valiFlag != null">#{valiFlag,jdbcType=VARCHAR},</if>
+                <if test="taskFlag != null">#{taskFlag,jdbcType=VARCHAR},</if>
+                <if test="crterId != null">#{crterId,jdbcType=VARCHAR},</if>
+                <if test="crteTime != null">#{crteTime,jdbcType=TIMESTAMP},</if>
+                <if test="updtrId != null">#{updtrId,jdbcType=VARCHAR},</if>
+                <if test="updtTime != null">#{updtTime,jdbcType=TIMESTAMP},</if>
+                <if test="delFlag != null">#{delFlag,jdbcType=VARCHAR},</if>
+                <if test="type != null">#{type,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.winning.hmap.portal.task.entity.Task">
+        update task
+        <set>
+                <if test="name != null">
+                    name = #{name,jdbcType=VARCHAR},
+                </if>
+                <if test="type != null">
+                    type = #{type,jdbcType=VARCHAR},
+                </if>
+                <if test="exeExpr != null">
+                    exe_expr = #{exeExpr,jdbcType=VARCHAR},
+                </if>
+                <if test="dscr != null">
+                    dscr = #{dscr,jdbcType=VARCHAR},
+                </if>
+                <if test="valiFlag != null">
+                    vali_flag = #{valiFlag,jdbcType=VARCHAR},
+                </if>
+                <if test="taskFlag != null">
+                    task_flag = #{taskFlag,jdbcType=VARCHAR},
+                </if>
+                <if test="crterId != null">
+                    crter_id = #{crterId,jdbcType=VARCHAR},
+                </if>
+                <if test="crteTime != null">
+                    crte_time = #{crteTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="updtrId != null">
+                    updtr_id = #{updtrId,jdbcType=VARCHAR},
+                </if>
+                <if test="updtTime != null">
+                    updt_time = #{updtTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="delFlag != null">
+                    del_flag = #{delFlag,jdbcType=VARCHAR}
+                </if>
+
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.task.entity.Task">
+        update task
+        set
+            name =  #{name,jdbcType=VARCHAR},
+            exe_expr =  #{exeExpr,jdbcType=VARCHAR},
+            dscr =  #{dscr,jdbcType=VARCHAR},
+            vali_flag =  #{valiFlag,jdbcType=VARCHAR},
+            task_flag =  #{taskFlag,jdbcType=VARCHAR},
+            crter_id =  #{crterId,jdbcType=VARCHAR},
+            crte_time =  #{crteTime,jdbcType=TIMESTAMP},
+            updtr_id =  #{updtrId,jdbcType=VARCHAR},
+            updtTime =  #{updtTime,jdbcType=TIMESTAMP},
+            del_flag =  #{delFlag,jdbcType=VARCHAR}
+        where  id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="deleteById">
+        update task
+        set  del_flag = '1'
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getJobNameById" resultType="java.lang.String">
+        select task_flag
+        from task
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="list"  resultType="com.winning.hmap.portal.task.entity.Task">
+        SELECT
+            t.id,
+            t.name,
+            t.exe_expr,
+            t.dscr,
+            t.vali_flag,
+            t.task_flag,
+            u.login_name,
+            t.updtr_id,
+            t.updt_time,
+            t.del_flag
+        FROM task t
+        LEFT JOIN sys_user u ON t.updtr_id=u.id
+        WHERE t.del_flag='0'
+        <if test="taskName!=null and taskName!=''.toString()">
+           AND t.name like concat('%',#{taskName},'%')
+        </if>
+    </select>
+
+    <select id="selectTaskByPage" resultType="com.winning.hmap.portal.task.entity.Task">
+        SELECT
+            t.id,
+            t.name,
+            t.exe_expr,
+            t.type,
+            t.dscr,
+            t.vali_flag,
+            t.task_flag,
+            u.login_name modifyName,
+            t.updtr_id,
+            t.updt_time,
+            t.del_flag
+        FROM task t
+        LEFT JOIN sys_user u ON t.updtr_id=u.id
+        WHERE t.del_flag='0'
+        <if test="paramObj != null">
+            <if test="paramObj.taskName != null and paramObj.taskName != ''">
+                AND t.name like concat('%',#{paramObj.taskName},'%')
+            </if>
+            <if test="paramObj.taskType != null and paramObj.taskType!=''.toString()">
+                AND t.type = #{paramObj.taskType,jdbcType=VARCHAR}
+            </if>
+            <if test="paramObj.valiFlag != null and paramObj.valiFlag!=''.toString()">
+                AND t.vali_flag = #{paramObj.valiFlag,jdbcType=VARCHAR}
+            </if>
+        </if>
+    </select>
+
+    <select id="getFileInfo" parameterType="String" resultType="java.util.Map">
+        SELECT
+            t.attachment_id attachment_id,
+            t.attachment_name ccmc,
+            t.attachment_original_name filename,
+            t.path path
+        FROM
+            t_case_attachment_tbl t
+        <where>
+            t.data_id = #{sjid,jdbcType=VARCHAR}
+            AND t.attachment_type = '1'
+            AND t.del_flag = '0'
+        </where>
+    </select>
+</mapper>

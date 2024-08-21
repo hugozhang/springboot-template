@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.winning.hmap.portal.task.mapper.TaskRsltMapper">
+
+    <insert id="insertTaskRslt">
+        insert into task_rslt(task_id,schm_id, exe_begntime, task_stas, log, bchno, data_sum, ticket_cd,run_bchno,task_name,schm_name,prrt)
+        values (#{taskId},#{schmId},#{exeBegntime},#{taskStas},#{log},#{ticketCd},#{dataSum,jdbcType=VARCHAR},#{ticketCd},#{runBchno},#{taskName},#{schmName},#{prrt})
+    </insert>
+
+    <update id="updateTaskRslt">
+        update task_rslt
+        set task_stas=#{taskStas},
+            log=#{log}
+        <if test="dataSum!=null">
+            ,data_sum=#{dataSum}
+        </if>
+        <if test="exeEndtime!=null">
+            ,exe_endtime=#{exeEndtime}
+        </if>
+        where ticket_cd = #{ticketCd}
+    </update>
+
+    <update id="updateTaskStas">
+        update task_rslt
+        set task_stas=#{taskStas}
+        where run_bchno= #{runBchno}
+    </update>
+</mapper>

@@ -1,0 +1,41 @@
+
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  session:
+    store-type: redis
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  web:
+    resources:
+      static-locations: file:static
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+#  file:
+#    name: logs/hmap-web/hmap-web.log
+  config: classpath:config/logback.xml
+
+server:
+  servlet:
+    session:
+      timeout: 30m
+
+me:
+  about:
+    widget:
+      spring:
+        match-url: /hmap

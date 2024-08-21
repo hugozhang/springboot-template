@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysRoleMapper">
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.auth.entity.SysRole" useGeneratedKeys="true">
+        insert into sys_role (id, `name`, del_flag,
+                              crte_time, crter_id, updt_time,
+                              updtr_id)
+        values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{delFlag,jdbcType=CHAR},
+                #{crteTime,jdbcType=TIMESTAMP}, #{crterId,jdbcType=BIGINT}, #{updtTime,jdbcType=TIMESTAMP},
+                #{updtrId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.auth.entity.SysRole">
+        update sys_role
+        <set>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=CHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crterId != null">
+                crter_id = #{crterId,jdbcType=BIGINT},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updtrId != null">
+                updtr_id = #{updtrId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPage">
+        <![CDATA[
+            SELECT
+                id role_id,
+                `name` role_name,
+                `del_flag` delFlag
+            FROM
+                sys_role
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.roleName != null and paramObj.roleName != ''">
+                    `name` like concat('%',#{paramObj.roleName},'%')
+                </if>
+                <if test="paramObj.delFlag != null and paramObj.delFlag != ''">
+                    `del_flag` = #{paramObj.delFlag}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findResourceByRoleId" resultType="com.winning.hmap.portal.auth.dto.auth.resp.RoleResource">
+        <![CDATA[
+            SELECT
+                role_id,
+                resource_id
+            FROM
+                sys_role_resource
+            WHERE role_id = #{roleId,jdbcType=BIGINT}
+        ]]>
+    </select>
+    
+    <select id="getRoleById" resultType="com.winning.hmap.portal.auth.dto.auth.resp.Role">
+        <![CDATA[
+            SELECT
+                 id role_id,
+                `name` role_name
+            FROM
+                sys_role
+            WHERE id = #{roleId,jdbcType=BIGINT}
+        ]]>
+    </select>
+
+    <select id="getRoleByName" resultType="com.winning.hmap.portal.auth.dto.auth.resp.Role">
+        <![CDATA[
+        SELECT
+            id role_id,
+            `name` role_name
+        FROM
+            sys_role
+        WHERE `name` = #{roleName,jdbcType=VARCHAR}
+        ]]>
+    </select>
+
+    <update id="disable">
+        update sys_role
+        set del_flag = '1'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="enable">
+        update sys_role
+        set del_flag = '0'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+</mapper>

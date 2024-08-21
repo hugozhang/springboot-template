@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+       default-init-method="init"
+       default-destroy-method="destroy">
+
+
+    <bean id="abstractDataSource" abstract="true" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close" init-method="init">
+        <property name="maxWait" value="5000"/>
+<!--        <property name="poolPreparedStatements" value="true"/>-->
+<!--        <property name="maxPoolPreparedStatementPerConnectionSize" value="50"/>-->
+        <property name="proxyFilters">
+            <list>
+                <ref bean="log-filter"/>
+                <ref bean="stat-filter"/>
+                <ref bean="wall-filter"/>
+            </list>
+        </property>
+        <property name="validationQuery" value="SELECT 1 "/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="asyncInit" value="true"/>
+<!--        <property name="connectionErrorRetryAttempts" value="3"/>-->
+<!--        <property name="breakAfterAcquireFailure" value="true"/>-->
+    </bean>
+
+    <bean id="dataSource" parent="abstractDataSource">
+        <property name="driverClassName" value="${ds.driverClassName}"/>
+        <property name="url" value="${ds.url}"/>
+        <property name="username" value="${ds.username}"/>
+        <property name="password" value="${ds.password}"/>
+        <property name="initialSize" value="${ds.initialPoolSize}"/>
+        <property name="minIdle" value="${ds.minPoolSize}"/>
+        <property name="maxActive" value="${ds.maxPoolSize}"/>
+    </bean>
+
+<!--    <bean id="rccDataSource" parent="abstractDataSource">-->
+<!--        <property name="driverClassName" value="${ds.middle.driverClassName}"/>-->
+<!--        <property name="url" value="${ds.middle.url}"/>-->
+<!--        <property name="username" value="${ds.middle.username}"/>-->
+<!--        <property name="password" value="${ds.middle.password}"/>-->
+<!--        <property name="initialSize" value="${ds.middle.initialPoolSize}"/>-->
+<!--        <property name="minIdle" value="${ds.middle.minPoolSize}"/>-->
+<!--        <property name="maxActive" value="${ds.middle.maxPoolSize}"/>-->
+<!--    </bean>-->
+
+    <bean id="dynamicDataSource" class="me.about.widget.mybatis.function.multidatasource.DynamicDataSource">
+        <property name="defaultTargetDataSource" ref="dataSource"/>
+        <property name="targetDataSources">
+            <map>
+                <entry key="db1" value-ref="dataSource"/>
+<!--                <entry key="db2" value-ref="rccDataSource"></entry>-->
+            </map>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+
+    <!--    <bean class="me.about.widget.mybatis.function.multidatasource.DynamicDataSourceAspect"/>-->
+
+<!--    <bean id="transactionManager" class="me.about.widget.mybatis.function.multidatasource.MultiDataSourceTransactionFactory"/>-->
+
+<!--    <bean id="transactionManager" class="org.mybatis.spring.transaction.SpringManagedTransactionFactory">-->
+<!--        <property name="dataSource" ref="dataSource"/>-->
+<!--    </bean>-->
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+<!--        <property name="transactionFactory" ref="transactionManager"/>-->
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-configuration.xml"/>
+        <property name="mapperLocations">
+            <array>
+                <value>classpath*:mapper/*Mapper.xml</value>
+                <value>classpath*:mapper/**/*Mapper.xml</value>
+            </array>
+        </property>
+    </bean>
+
+
+
+    <tx:annotation-driven />
+
+
+    <!-- 关掉 -->
+    <!--AOP声明事务管理配置 -->
+    <!--控制事务的类必须以"BOImpl"结尾，且方法名必须以save,delete,add,modify,update,insert,remove开头 -->
+    <!--事务通过外部xml进行配置，请不要在代码中通过注解的方式进行事务控制-->
+    <aop:config>
+        <aop:pointcut expression="execution(public * com.winning.hmap..*BOXXXXImpl.*(..))" id="pointcut"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+    </aop:config>
+
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <tx:method name="query*" read-only="true"/>
+            <tx:method name="find*"  read-only="true"/>
+            <tx:method name="get*"  read-only="true"/>
+            <tx:method name="list*"  read-only="true"/>
+
+            <tx:method name="save*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="add*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="insert*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="delete*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="remove*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="modify*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="update*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="enable*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="disable*"  rollback-for="java.lang.Exception"/>
+            <tx:method name="upload*"  rollback-for="java.lang.Exception"/>
+
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+
+
+    <bean id="wall-config" class="com.alibaba.druid.wall.WallConfig">
+        <constructor-arg value="META-INF/druid/wall/mysql"/>
+        <property name="multiStatementAllow" value="true"/>
+        <property name="selectUnionCheck" value="false"/>
+        <property name="strictSyntaxCheck" value="false"/>
+    </bean>
+
+    <bean id="wall-filter" class="com.alibaba.druid.wall.WallFilter">
+        <property name="dbType" value="mysql"/>
+        <property name="config" ref="wall-config"/>
+    </bean>
+
+    <bean id="log-filter" class="com.alibaba.druid.filter.logging.Log4jFilter">
+        <property name="statementExecutableSqlLogEnable" value="true"/>
+        <property name="connectionLogEnabled" value="true"/>
+    </bean>
+    <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+        <property name="mergeSql" value="true"/>
+        <property name="slowSqlMillis" value="1000"/>
+        <property name="logSlowSql" value="true"/>
+    </bean>
+
+
+    <bean id="druid-stat-interceptor"
+          class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+    </bean>
+
+    <bean id="druid-stat-pointcut"
+          class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+          scope="prototype">
+        <property name="patterns">
+            <list>
+                <value>com.winning.hmap.*.*.service.*</value>
+            </list>
+        </property>
+    </bean>
+
+    <aop:config>
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut" />
+    </aop:config>
+</beans>

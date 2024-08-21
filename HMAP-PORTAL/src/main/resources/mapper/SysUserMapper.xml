@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysUserMapper">
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.auth.entity.SysUser" useGeneratedKeys="true">
+        insert into sys_user (id, login_name, `password`,
+                              username, dr_id, del_flag,
+                              crte_time, crter_id, updt_time,
+                              updtr_id)
+        values (#{id,jdbcType=BIGINT}, #{loginName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+                #{username,jdbcType=VARCHAR}, #{drId,jdbcType=BIGINT}, #{delFlag,jdbcType=CHAR},
+                #{crteTime,jdbcType=TIMESTAMP}, #{crterId,jdbcType=BIGINT}, #{updtTime,jdbcType=TIMESTAMP},
+                #{updtrId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.auth.entity.SysUser">
+        update sys_user
+        <set>
+            <if test="loginName != null">
+                login_name = #{loginName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="drId != null">
+                dr_id = #{drId,jdbcType=BIGINT},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=CHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crterId != null">
+                crter_id = #{crterId,jdbcType=BIGINT},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updtrId != null">
+                updtr_id = #{updtrId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="disable">
+        update sys_user
+        set del_flag = '1'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="enable">
+        update sys_user
+        set del_flag = '0'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="getUserByLoginName" resultType="com.winning.hmap.portal.auth.entity.SysUser" parameterType="java.lang.String">
+        select
+            id,
+            login_name,
+            username,
+            password,
+            dr_id,
+            del_flag
+        from
+            sys_user
+        where
+            login_name = #{loginName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getUserByDrId" resultType="com.winning.hmap.portal.auth.entity.SysUser" parameterType="java.lang.Long">
+        select
+            id,
+            login_name,
+            username,
+            password,
+            dr_id
+        from
+            sys_user
+        where del_flag = '0' and dr_id = #{drId,jdbcType=BIGINT}
+    </select>
+
+    <select id="getUserByUserId" resultType="com.winning.hmap.portal.auth.entity.SysUser" parameterType="java.lang.Long">
+        select
+            id,
+            login_name,
+            username,
+            password,
+            dr_id
+        from
+            sys_user
+        where id = #{drId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByPage" resultType="com.winning.hmap.portal.auth.entity.SysUser">
+        <![CDATA[
+        SELECT DISTINCT
+	        u.id,
+	        u.del_flag,
+	        u.login_name,
+	        u.username,
+	        u.dr_id,
+	        u.crte_time
+        FROM
+	        sys_user u
+	        INNER JOIN sys_medins_dept_doctor d ON u.dr_id = d.dr_id
+	        INNER JOIN sys_medins_dept m ON m.id = d.medins_dept_id
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.username != null and paramObj.username != ''">
+                   and u.username like concat('%',#{paramObj.username},'%')
+                </if>
+                <if test="paramObj.loginName != null and paramObj.loginName != ''">
+                    and u.login_name like concat('%',#{paramObj.loginName},'%')
+                </if>
+                <if test="paramObj.deptCodes != null and paramObj.deptCodes.size()>0">
+                    and m.id in
+                    <foreach collection="paramObj.deptCodes" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </if>
+        </where>
+        order by u.crte_time desc
+    </select>
+
+    <select id="findUserList" resultType="com.winning.hmap.portal.auth.entity.SysUser">
+        <![CDATA[
+        SELECT DISTINCT
+	        u.id,
+	        u.del_flag,
+	        u.login_name,
+	        u.username,
+	        u.dr_id,
+	        u.crte_time
+        FROM
+	        sys_user u
+	        INNER JOIN sys_medins_dept_doctor d ON u.dr_id = d.dr_id
+	        INNER JOIN sys_medins_dept m ON m.id = d.medins_dept_id
+        ]]>
+        <where>
+            u.del_flag = '0'
+            <if test="deptId != null and deptId != ''">
+               and m.id = #{deptId,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
+
+    <!-- 批量插入用户信息 -->
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_user(login_name, password, username, dr_id, del_flag, crte_time, crter_id) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.loginName}, #{item.password}, #{item.username}, #{item.drId}, #{item.delFlag}, #{item.crteTime}, #{item.crterId})
+        </foreach>
+    </insert>
+
+    <select id="selectByUserId" resultType="com.winning.hmap.portal.auth.entity.SysUser" parameterType="long">
+        select
+            id,
+            login_name,
+            username,
+            password,
+            dr_id
+        from
+            sys_user
+        where
+            id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByUserName" resultType="com.winning.hmap.portal.auth.entity.SysUser" parameterType="string">
+        select
+            id,
+            login_name,
+            username
+        from
+            sys_user
+        where
+            (username like concat('%',#{userName},'%') or login_name like  concat('%',#{userName},'%')) and del_flag = '0' limit 20
+    </select>
+
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.task.mapper.TaskSchmRltsMapper">
+
+    <resultMap id="BaseResultMap" type="com.winning.hmap.portal.task.entity.TaskSchmRlts">
+        <result property="taskId" column="task_id" jdbcType="VARCHAR"/>
+        <result property="schmId" column="schm_id" jdbcType="VARCHAR"/>
+        <result property="prrt" column="prrt" jdbcType="INTEGER"/>
+        <result property="delFlag" column="del_flag" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        task_id,schm_id,prrt,del_flag
+    </sql>
+
+    <insert id="insert" parameterType="com.winning.hmap.portal.task.entity.TaskSchmRlts">
+        insert into task_schm_rlts
+        (task_id,schm_id,prrt,del_flag)
+        values (#{taskId}, #{schmId},
+                #{prrt,jdbcType=INTEGER},#{delFlag,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="deleteByTaskId">
+        update task_schm_rlts
+        set del_flag = '1'
+        where task_id = #{taskId}
+    </update>
+
+    <select id="getCountByPlanId" resultType="java.lang.Integer">
+        select count(*)
+        from task_schm_rlts
+        where schm_id = #{schmId,jdbcType=VARCHAR}
+        AND del_flag = '0'
+    </select>
+
+    <select id="getTaskSchmRltsBySchmIdAndTaskId" resultType="com.winning.hmap.portal.task.entity.TaskSchmRlts">
+        select
+            task_id,
+            schm_id,
+            prrt,
+            del_flag
+        from
+            task_schm_rlts
+        where schm_id = #{schmId}
+          AND task_id = #{taskId}
+        limit 1
+    </select>
+
+    <select id="getCountByDto" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            TASK_SCHM
+        WHERE
+            TYPE =#{type,jdbcType=VARCHAR}
+            AND NAME =#{name,jdbcType=VARCHAR}
+            AND IMPL =#{impl,jdbcType=VARCHAR}
+            AND DEL_FLAG = '0'
+            <if test="id!=null and id!=''">
+                AND id != #{id}
+            </if>
+    </select>
+
+    <update id="enableSchm">
+        update task_schm_rlts
+        set del_flag = '0'
+        where task_id = #{taskId}
+        and schm_id = #{schmId}
+    </update>
+
+    <update id="disableSchm">
+        update task_schm_rlts
+        set del_flag = '1'
+        where task_id = #{taskId}
+        and schm_id = #{schmId}
+    </update>
+
+    <update id="updateByOldPlanId">
+        update task_schm_rlts
+        set schm_id = #{schmId}
+        where task_id = #{taskId}
+        and schm_id = #{oldSchmId}
+    </update>
+
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        select COALESCE(MAX(prrt), 0)
+        from task_schm_rlts
+        where task_id = #{taskId}
+    </select>
+
+    <select id="getByTaskId" resultType="com.winning.hmap.portal.task.dto.resp.TaskSchm">
+        SELECT
+            p.id schmId,
+            p.name schmName,
+            p.type schmType,
+            p.impl,
+            p.para,
+            r.prrt,
+            t.name taskName,
+            t.id taskId,
+            p.att_uuid,
+            p.vali_flag
+        FROM task t
+        INNER JOIN task_schm_rlts r ON t.id=r.task_id AND r.del_flag='0'
+        INNER JOIN task_schm p ON p.id=r.schm_id
+        WHERE t.id=#{id,jdbcType=VARCHAR}
+        AND t.del_flag='0'
+        AND t.vali_flag='1'
+        AND p.vali_flag='1'
+        AND p.del_flag='0'
+        ORDER BY r.prrt
+    </select>
+
+    <select id="getPlanByPage" resultType="com.winning.hmap.portal.task.dto.resp.TaskSchm">
+        SELECT
+            p.id schmId,
+            p.name schmName,
+            p.type schmType,
+            p.impl,
+            p.para,
+            r.prrt,
+            t.id taskId,
+            t.name taskName,
+            p.att_uuid,
+            p.vali_flag
+        FROM task t
+        INNER JOIN task_schm_rlts r ON t.id=r.task_id AND r.del_flag='0'
+        INNER JOIN task_schm p ON r.schm_id=p.id
+        WHERE t.del_flag='0'
+        <if test="paramObj != null">
+            <if test="paramObj.taskId != null and paramObj.taskId != ''">
+                AND t.id=#{paramObj.taskId}
+            </if>
+        </if>
+    </select>
+</mapper>

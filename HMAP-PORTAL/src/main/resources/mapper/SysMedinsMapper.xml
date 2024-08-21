@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysMedinsMapper">
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.auth.entity.SysMedins" useGeneratedKeys="true">
+        insert into sys_medins (id, medins_name, medins_no,
+                                medins_lv, medins_type,
+                                medins_cat, del_flag,
+                                crte_time, crter_id, updt_time,
+                                updtr_id)
+        values (#{id,jdbcType=BIGINT}, #{medinsName,jdbcType=VARCHAR}, #{medinsNo,jdbcType=VARCHAR},
+                #{medinsLv,jdbcType=VARCHAR}, #{medinsType,jdbcType=VARCHAR},
+                #{medinsCat,jdbcType=VARCHAR}, #{delFlag,jdbcType=CHAR},
+                #{crteTime,jdbcType=TIMESTAMP}, #{crterId,jdbcType=BIGINT}, #{updtTime,jdbcType=TIMESTAMP},
+                #{updtrId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.auth.entity.SysMedins">
+        update sys_medins
+        <set>
+            <if test="medinsName != null">
+                medins_name = #{medinsName,jdbcType=VARCHAR},
+            </if>
+            <if test="medinsNo != null">
+                medins_no = #{medinsNo,jdbcType=VARCHAR},
+            </if>
+            <if test="medinsLv != null">
+                medins_lv = #{medinsLv,jdbcType=VARCHAR},
+            </if>
+            <if test="medinsType != null">
+                medins_type = #{medinsType,jdbcType=VARCHAR},
+            </if>
+            <if test="medinsCat != null">
+                medins_cat = #{medinsCat,jdbcType=VARCHAR},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=CHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crterId != null">
+                crter_id = #{crterId,jdbcType=BIGINT},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updtrId != null">
+                updtr_id = #{updtrId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="disable">
+        update sys_medins
+        set del_flag = '1'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="enable">
+        update sys_medins
+        set del_flag = '0'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="getMedinsById" resultType="com.winning.hmap.portal.auth.entity.SysMedins">
+        <![CDATA[
+        SELECT
+            id,
+            medins_name,
+            medins_no,
+            medins_lv,
+            medins_type,
+            medins_cat
+        FROM
+            sys_medins
+        WHERE
+            id = #{id,jdbcType=BIGINT}
+        ]]>
+    </select>
+
+    <select id="getMedinsByCode" resultType="com.winning.hmap.portal.auth.entity.SysMedins">
+        <![CDATA[
+        SELECT
+            id,
+            medins_name,
+            medins_no,
+            medins_lv,
+            medins_type,
+            medins_cat
+        FROM
+            sys_medins
+        WHERE
+            medins_no = #{medinsNo}
+        ]]>
+    </select>
+
+    <select id="selectByPage" resultType="com.winning.hmap.portal.auth.dto.auth.resp.Medins">
+        <![CDATA[
+        SELECT
+            id medins_id,
+            medins_name,
+            medins_no,
+            medins_lv,
+            medins_type,
+            medins_cat,
+            del_flag
+        FROM
+            sys_medins
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.medinsNameOrCode != null and paramObj.medinsNameOrCode != ''">
+                    medins_name like concat('%',#{paramObj.medinsNameOrCode},'%') or medins_no like concat('%',#{paramObj.medinsNameOrCode},'%')
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="options" parameterType="com.winning.hmap.portal.auth.dto.auth.req.query.MedinsParam" resultType="com.winning.hmap.portal.auth.dto.auth.resp.OptionItem">
+        <![CDATA[
+        SELECT
+            medins_name name,
+            id value
+        FROM
+            sys_medins
+        ]]>
+        <where>
+            del_flag = 0
+            <if test="medinsNameOrCode != null and medinsNameOrCode != ''">
+                AND (medins_name LIKE concat('%',#{medinsNameOrCode},'%') OR medins_no LIKE concat('%',#{medinsNameOrCode},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="medinsIdList" resultType="java.lang.String">
+        <![CDATA[
+        SELECT
+            distinct medins_no
+        FROM
+            sys_medins
+        ]]>
+        <where>
+            del_flag = 0
+        </where>
+    </select>
+
+
+</mapper>

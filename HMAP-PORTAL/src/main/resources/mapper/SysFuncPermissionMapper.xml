@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysFuncPermissionMapper">
+    <select id="findAllFuncPermission" resultType="com.winning.hmap.portal.auth.dto.auth.resp.FuncPermission">
+        <![CDATA[
+            SELECT
+                id,
+                `name`,
+                `code`
+            FROM
+                sys_func_permission
+            WHERE del_flag = '0'
+        ]]>
+    </select>
+</mapper>

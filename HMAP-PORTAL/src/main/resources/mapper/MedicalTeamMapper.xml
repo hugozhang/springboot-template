@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding= "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.winning.hmap.portal.auth.mapper.MedicalTeamMapper">
+    <!-- 导入查询 -->
+    <select id="query" resultType="com.winning.hmap.portal.auth.entity.SysMedGrp">
+		SELECT
+			t1.id,
+			t1.dept_name,
+			t1.dept_id,
+			t2.dept_code,
+			t1.med_grp_name,
+			t1.med_grp_code,
+			t1.grp_leader_name,
+			t1.grp_leader_code,
+			t1.vali_flag
+		FROM
+			sys_med_grp t1
+		LEFT JOIN sys_medins_dept t2 ON t1.dept_id = t2.id
+		<where>
+			<if test="paramObj != null">
+				<if test="paramObj.deptIds!=null and paramObj.deptIds.size()>0">
+					and t1.dept_id in
+					<foreach collection="paramObj.deptIds" item="item" open="(" separator="," close=")">
+						#{item}
+					</foreach>
+				</if>
+				<if test="paramObj.medGrpNameOrCode != null and paramObj.medGrpNameOrCode !=''">
+					and (t1.med_grp_name like CONCAT('%',#{paramObj.medGrpNameOrCode},'%' ) or t1.med_grp_code like CONCAT('%',#{paramObj.medGrpNameOrCode},'%' ))
+				</if>
+				<if test="paramObj.grpLeaderNameOrCode != null and paramObj.grpLeaderNameOrCode !=''">
+					and (t1.grp_leader_name like CONCAT('%',#{paramObj.grpLeaderNameOrCode},'%' ) or t1.grp_leader_code like CONCAT('%',#{paramObj.grpLeaderNameOrCode},'%' ))
+				</if>
+			</if>
+		</where>
+		ORDER BY t1.id desc
+    </select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_med_grp(dept_name,dept_id,med_grp_code,med_grp_name,grp_leader_name,grp_leader_code,crte_time,crter_id,updt_time,updtr_id)values
+		(#{deptName},#{deptId},#{medGrpCode},#{medGrpName},#{grpLeaderName},#{grpLeaderCode},#{crteTime},#{crterId},#{updtTime},#{updtrId})
+	</insert>
+
+	<insert id="insertSysMedGrps" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_med_grp(
+			dept_name,dept_id,med_grp_code,med_grp_name,grp_leader_name,grp_leader_code,crte_time,crter_id,updt_time,updtr_id
+		)values
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.deptName},
+			#{item.deptId},
+			#{item.medGrpCode},
+			#{item.medGrpName},
+			#{item.grpLeaderName},
+			#{item.grpLeaderCode},
+			#{item.crteTime},
+			#{item.crterId},
+			#{item.updtTime},
+			#{item.updtrId})
+		</foreach>
+
+	</insert>
+
+	<update id="deleteById">
+		update sys_med_grp
+		SET vali_flag=1
+		where med_grp_code = #{id}
+	</update>
+
+	<select id="getById"  resultType="com.winning.hmap.portal.auth.entity.SysMedGrp">
+		SELECT
+			id,
+			dept_name,
+			dept_id,
+			med_grp_name,
+			med_grp_code,
+			grp_leader_name,
+			grp_leader_code,
+			vali_flag
+		FROM
+			sys_med_grp
+		where id=#{id}
+	</select>
+
+	<select id="getCountByGroupCode" resultType="java.lang.Integer">
+		SELECT count(*)	FROM sys_med_grp
+		where med_grp_code = #{medGrpCode}
+		<if test="id!=null and id!=''">
+			and id != #{id}
+		</if>
+	</select>
+
+	<select id="selectListByGroupCode" parameterType="Map" resultType="com.winning.hmap.portal.auth.entity.SysMedGrp">
+		SELECT
+			dept_name,
+			dept_id,
+			med_grp_name,
+			med_grp_code,
+			grp_leader_name,
+			grp_leader_code
+		FROM
+			sys_med_grp
+		where med_grp_code = #{medGrpCode}
+	</select>
+
+	<select id="queryGroupCodeList" resultType="java.lang.String">
+		SELECT DISTINCT
+			med_grp_code
+		FROM sys_med_grp
+		where vali_flag = '0'
+	</select>
+
+	<update id="updateSysMedGrp">
+		update sys_med_grp
+		SET dept_name=#{deptName},
+			dept_id=#{deptId},
+			med_grp_name=#{medGrpName},
+			grp_leader_name=#{grpLeaderName},
+			grp_leader_code=#{grpLeaderCode},
+			vali_flag=#{valiFlag},
+			updt_time=#{updtTime},
+			updtr_id=#{updtrId}
+		where id=#{id}
+	</update>
+
+	<update id="updateSysMedGrps">
+		<foreach collection="list" item="item" separator=";">
+			update sys_med_grp
+			SET dept_name=#{item.deptName},
+				dept_id=#{item.deptId},
+				med_grp_name=#{item.medGrpName},
+				grp_leader_name=#{item.grpLeaderName},
+				grp_leader_code=#{item.grpLeaderCode}
+			where med_grp_code=#{item.medGrpCode}
+		</foreach>
+	</update>
+
+	<update id="updateMedicalById">
+		update sys_med_grp
+		<set>
+			<if test="medGrpCode !=null">
+				med_grp_code=#{medGrpCode},
+			</if>
+			<if test="valiFlag != null">
+				vali_flag = #{valiFlag,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+
+    <select id="findSysMedGrpByYsId" resultType="java.lang.Long">
+		SELECT dr_id FROM sys_user WHERE del_flag = 1
+		<if test="list!=null and list.size() > 0 ">
+			and	dr_id in (
+			<foreach item="item" collection="list" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
+	</select>
+
+	<select id="queryUsedCountByDeptCode" parameterType="com.winning.hmap.portal.auth.entity.SysMedGrp" resultType="int">
+		SELECT
+			count( DISTINCT t1.med_grp_code)
+		FROM sys_med_grp t1
+		INNER JOIN sys_doctor_med_grp t2 ON t1.id = t2.med_grp_id
+		LEFT JOIN sys_doctor t3 ON t2.dr_id = t3.id
+		WHERE t1.vali_flag = '0' AND t2.med_grp_id = #{id}
+	</select>
+
+	<select id="queryGrpByDrId" parameterType="long" resultType="com.winning.hmap.portal.auth.entity.SysMedGrp">
+		SELECT
+		    t1.id,
+			med_grp_name,
+			med_grp_code
+		FROM sys_med_grp t1
+		INNER JOIN sys_doctor_med_grp t2 ON t1.id = t2.med_grp_id
+		WHERE  t2.dr_id = #{drId}
+	</select>
+
+	<update id="deleteSysMedGrpsByDeId" parameterType="long">
+		delete from sys_doctor_med_grp
+		where dr_id = #{drId}
+	</update>
+
+	<insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+		insert into sys_doctor_med_grp
+		(id,dr_id,med_grp_id,crte_time,updt_time) values
+		<foreach collection="list" index="index" item="item" separator=",">
+			(#{item.id,jdbcType=BIGINT},#{item.drId,jdbcType=BIGINT},#{item.medGrpId,jdbcType=BIGINT},#{item.crteTime,jdbcType=TIMESTAMP},#{item.updtTime,jdbcType=TIMESTAMP})
+		</foreach>
+	</insert>
+
+	<select id="queryGroupList" resultType="com.winning.hmap.portal.auth.entity.SysMedGrp">
+		SELECT
+			id,
+			dept_name,
+			dept_id,
+			med_grp_name,
+			med_grp_code,
+			grp_leader_name,
+			grp_leader_code,
+			vali_flag,
+			crte_time,
+			crter_id,
+			updt_time,
+			updtr_id
+		FROM
+			sys_med_grp
+	</select>
+
+</mapper>

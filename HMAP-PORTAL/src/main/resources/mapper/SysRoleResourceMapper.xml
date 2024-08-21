@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysRoleResourceMapper">
+
+  <insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+    insert into sys_role_resource
+    (id,role_id,resource_id,crte_time,crter_id,updt_time,updtr_id) values
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.id,jdbcType=BIGINT},#{item.roleId,jdbcType=BIGINT},#{item.resourceId,jdbcType=BIGINT},#{item.crteTime,jdbcType=TIMESTAMP},#{item.crterId,jdbcType=BIGINT},#{item.updtTime,jdbcType=TIMESTAMP},#{item.updtrId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+
+  <delete id="deleteByRoleId" parameterType="java.lang.Long">
+    delete from sys_role_resource where role_id=#{roleId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="findResourceByRoleId" resultType="com.winning.hmap.portal.auth.entity.SysResource">
+    <![CDATA[
+    SELECT DISTINCT
+      d.id,
+      d.`name`,
+      d.parent_id,
+      d.icon,
+      d.url,
+      d.sort_by,
+      d.CODE
+    FROM
+      sys_resource a
+        INNER JOIN sys_role_resource b ON a.id = b.resource_id
+        LEFT JOIN sys_resource c ON a.parent_id = c.id or a.id = c.id
+        LEFT JOIN sys_resource d ON c.parent_id = d.id or c.id = d.id
+    WHERE b.role_id = #{roleId,jdbcType=BIGINT} and a.del_flag = '0' order by sort_by
+    ]]>
+  </select>
+</mapper>

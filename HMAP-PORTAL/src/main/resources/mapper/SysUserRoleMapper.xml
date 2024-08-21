@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysUserRoleMapper">
+
+  <insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+    insert into sys_user_role
+    (id,user_id,role_id,crte_time,crter_id,updt_time,updtr_id) values
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.id,jdbcType=BIGINT},#{item.userId,jdbcType=BIGINT},#{item.roleId,jdbcType=BIGINT},#{item.crteTime,jdbcType=TIMESTAMP},#{item.crterId,jdbcType=BIGINT},#{item.updtTime,jdbcType=TIMESTAMP},#{item.updtrId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+
+  <delete id="deleteByUserId">
+    delete from sys_user_role where user_id = #{userId}
+  </delete>
+
+  <select id="findRoleListByUserId" resultType="com.winning.hmap.portal.auth.entity.SysUserRole" parameterType="java.lang.Long">
+    select
+      user_id,
+      role_id
+    from
+      sys_user_role
+    where
+      user_id = #{userId,jdbcType=BIGINT}
+    order by id asc
+  </select>
+
+  <insert id="insertUserRoleBatch" parameterType="java.util.List">
+    insert into sys_user_role(user_id,role_id,crte_time,crter_id)
+    values
+    <foreach collection="list" item="item" index="index"
+             separator=",">
+      (#{item.id},3,#{item.crteTime},#{item.crterId})
+    </foreach>
+  </insert>
+
+</mapper>

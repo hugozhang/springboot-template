@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysRoleResourceFuncPermissionMapper">
+
+  <insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+    insert into sys_role_resource_func_permission
+    (id,role_id,resource_id,func_permission_id,crte_time,crter_id,updt_time,updtr_id) values
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.id,jdbcType=BIGINT},#{item.roleId,jdbcType=BIGINT},#{item.resourceId,jdbcType=BIGINT},#{item.funcPermissionId,jdbcType=BIGINT},#{item.crteTime,jdbcType=TIMESTAMP},#{item.crterId,jdbcType=BIGINT},#{item.updtTime,jdbcType=TIMESTAMP},#{item.updtrId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+
+  <delete id="deleteByRoleId" parameterType="java.lang.Long">
+    delete from sys_role_resource_func_permission where role_id=#{roleId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="findFuncPermissionByRoleId" resultType="com.winning.hmap.portal.auth.entity.SysRoleResourceFuncPermission">
+    <![CDATA[
+    SELECT
+      resource_id,
+      func_permission_id
+    FROM
+      sys_role_resource_func_permission
+    WHERE role_id = #{roleId}
+    ]]>
+    </select>
+</mapper>

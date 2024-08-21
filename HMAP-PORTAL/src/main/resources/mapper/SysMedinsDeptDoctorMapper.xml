@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysMedinsDeptDoctorMapper">
+
+  <insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+    insert into sys_medins_dept_doctor
+    (id,dr_id,medins_dept_id,crte_time,crter_id,updt_time,updtr_id) values
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.id,jdbcType=BIGINT},#{item.drId,jdbcType=BIGINT},#{item.medinsDeptId,jdbcType=BIGINT},#{item.crteTime,jdbcType=TIMESTAMP},#{item.crterId,jdbcType=BIGINT},#{item.updtTime,jdbcType=TIMESTAMP},#{item.updtrId,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+
+  <delete id="deleteByDoctorId">
+    delete from sys_medins_dept_doctor where dr_id=#{doctorId}
+  </delete>
+
+  <select id="findDeptListByDoctorId" parameterType="Long" resultType="com.winning.hmap.portal.auth.dto.auth.resp.DoctorDept">
+    <![CDATA[
+    SELECT
+      b.id dept_id,
+      c.id medins_id
+    FROM
+      sys_medins_dept_doctor a
+        LEFT JOIN sys_medins_dept b ON a.medins_dept_id = b.id
+        LEFT JOIN sys_medins c ON b.medins_id = c.id
+    WHERE a.dr_id=#{drId}
+    ORDER BY a.id ASC
+    ]]>
+    </select>
+
+  <select id="queryDeptNameByUserId" parameterType="Long" resultType="String">
+    <![CDATA[
+    SELECT
+      md.dept_name
+    FROM
+      sys_medins_dept md
+        INNER JOIN sys_medins_dept_doctor mdd ON md.id = mdd.medins_dept_id
+        INNER JOIN sys_user u ON u.dr_id = mdd.dr_id
+    where u.id = #{userId}
+    order by mdd.id ASC limit 1
+    ]]>
+    </select>
+
+</mapper>

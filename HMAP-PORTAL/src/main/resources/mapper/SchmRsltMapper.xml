@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.winning.hmap.portal.task.mapper.SchmRsltMapper">
+
+    <resultMap id="BaseResultMap" type="com.winning.hmap.portal.task.dto.resp.TaskSchm">
+        <id property="schmId" column="schm_id" jdbcType="VARCHAR"/>
+        <result property="schmName" column="schm_name" jdbcType="VARCHAR"/>
+        <result property="schmType" column="schm_type" jdbcType="VARCHAR"/>
+        <result property="impl" column="impl" jdbcType="VARCHAR"/>
+        <result property="para" column="para" jdbcType="VARCHAR"/>
+        <result property="taskName" column="task_name" jdbcType="VARCHAR"/>
+        <result property="prrt" column="prrt" jdbcType="VARCHAR"/>
+        <result property="attUuid" column="att_uuid" jdbcType="VARCHAR"/>
+        <result property="valiFlag" column="schm_vali_flag" jdbcType="VARCHAR"/>
+        <result property="ticketCd" column="ticket_cd" jdbcType="VARCHAR"/>
+        <result property="taskId" column="task_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="querySchmRslt"  resultType="com.winning.hmap.portal.task.dto.resp.TaskRslt">
+        SELECT
+            min(t2.exe_begntime) as exeBegntime,
+            sum( t2.data_sum ) as dataSum,
+            min(t2.task_name) taskName,
+            min(t2.task_type) taskType,
+            IF(min(IFNULL(exe_endtime,'-'))='-',null, max( t2.exe_endtime ) )  exeEndtime,
+            min( t2.task_id ) taskId,
+            IF(max( t2.task_stas )='9', '9', min( t2.task_stas ) )  taskStas,
+<!--                t1.taskStas,IF(t1.taskStas!='9','2',t1.`read`) as `read`,-->
+<!--                min(IF(t2.read_id is null,'0','1')) as `read`,-->
+            '1' `read`,
+            t2.run_bchno runBchno
+         FROM (
+              SELECT
+                    t.name as task_name,t.type AS task_type,date_format(j.exe_begntime, '%Y-%m-%d %H:%i:%S') exe_begntime,
+                    date_format( j.exe_endtime, '%Y-%m-%d %H:%i:%S' ) exe_endtime,j.task_id,j.task_stas,
+                    j.data_sum,j.run_bchno,r.prrt,tz.id read_id
+              FROM task_rslt j
+              INNER JOIN task t ON t.id = j.task_id
+              INNER JOIN task_schm p ON p.id = j.schm_id
+              LEFT  JOIN task_schm_rlts r ON r.task_id = j.task_id  AND r.schm_id = j.schm_id AND r.del_flag = 0
+              LEFT JOIN task_rslt_read tz on tz.exe_rslt_id = j.id
+              WHERE j.run_bchno IS NOT NULL
+              ORDER BY r.prrt DESC
+        ) as t2
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.runBchno != null and paramObj.runBchno != ''">
+                    and t2.run_bchno=#{paramObj.runBchno}
+                </if>
+                <if test="paramObj.taskType != null and paramObj.taskType != ''">
+                    and t2.task_type=#{paramObj.taskType}
+                </if>
+                <if test="paramObj.taskStas != null and paramObj.taskStas!=''">
+                    AND t2.task_stas=#{paramObj.taskStas}
+                </if>
+                <if test="paramObj.taskName != null and paramObj.taskName!=''.toString()">
+                   AND t2.task_name like concat('%',#{paramObj.taskName},'%')
+                </if>
+    <!--            <if test="paramObj.read != null and paramObj.read!=''">-->
+    <!--                AND  `read` = #{paramObj.read}-->
+    <!--            </if>-->
+            </if>
+        </where>
+        GROUP BY  t2.run_bchno
+        ORDER BY exeBegntime desc
+    </select>
+
+    <select id="querySchmDetails" resultType="com.winning.hmap.portal.task.dto.resp.TaskRslt">
+        SELECT
+            j.id,
+            j.schm_id,
+            j.schm_name,
+            j.task_name,
+            t.type,
+            j.exe_begntime,
+            j.exe_endtime,
+            j.task_stas,
+            j.data_sum,
+            j.run_bchno,
+            j.task_id,
+            j.log,
+            j.prrt
+        FROM
+        task_rslt j
+        INNER JOIN task t ON t.id = j.task_id
+        WHERE j.run_bchno IS NOT NULL
+        <if test="runBchno != null and runBchno != ''">
+            AND j.run_bchno= #{runBchno}
+        </if>
+        <if test="taskId != null and taskId!=''.toString()">
+            AND j.task_id= #{taskId}
+        </if>
+    </select>
+
+    <select id="queryTaskSchmByRunBchno" resultMap="BaseResultMap">
+        SELECT
+            p.id schm_id,
+            p.name schm_name,
+            p.type schm_type,
+            p.impl,
+            p.para,
+            r.prrt,
+            t.name task_name,
+            p.att_uuid,
+            p.vali_flag schm_vali_flag,
+            j.ticket_cd,
+            t.id as task_id
+        FROM TASK t
+        INNER JOIN TASK_SCHM_RLTS r ON t.id=r.task_id AND r.del_flag='0'
+        INNER JOIN TASK_SCHM p ON r.schm_id=p.id
+        INNER JOIN (select a.task_id,a.ticket_cd,a.schm_id from TASK_RSLT a where a.run_bchno= #{runBatchId}) j on p.id = j.schm_id
+        WHERE  t.del_flag='0'
+        AND t.vali_flag='1'
+        AND p.vali_flag='1'
+        AND p.del_flag='0'
+        ORDER BY r.prrt
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysResourceMapper">
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.auth.entity.SysResource" useGeneratedKeys="true">
+        insert into sys_resource (id, parent_id, `name`,`code`,
+                                  icon, `type`, url, sort_by,
+                                  del_flag, crte_time, crter_id,
+                                  updt_time, updtr_id)
+        values (#{id,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},#{code,jdbcType=VARCHAR},
+                #{icon,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{url,jdbcType=VARCHAR}, #{sortBy,jdbcType=INTEGER},
+                #{delFlag,jdbcType=CHAR}, #{crteTime,jdbcType=TIMESTAMP}, #{crterId,jdbcType=BIGINT},
+                #{updtTime,jdbcType=TIMESTAMP}, #{updtrId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.auth.entity.SysResource">
+        update sys_resource
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                `code` = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                icon = #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="sortBy != null">
+                sort_by = #{sortBy,jdbcType=INTEGER},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=CHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crterId != null">
+                crter_id = #{crterId,jdbcType=BIGINT},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updtrId != null">
+                updtr_id = #{updtrId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="findMenuByParentId" resultType="com.winning.hmap.portal.auth.entity.SysResource">
+        <![CDATA[
+        SELECT
+            id,
+            `name`,
+            `code`,
+            icon,
+            url,
+            sort_by
+        FROM
+            sys_resource
+        WHERE
+            parent_id = #{parentId} AND `type` = 1
+        ORDER BY sort_by asc
+        ]]>
+    </select>
+
+    <select id="findAllMenu" resultType="com.winning.hmap.portal.auth.entity.SysResource">
+        <![CDATA[
+        SELECT
+            id,
+            parent_id as "parentId",
+            `name`,
+            `code`,
+            icon,
+            url,
+            sort_by as "sortBy"
+        FROM
+            sys_resource
+        WHERE `type` = 1 and del_flag = 0
+        ORDER BY sort_by asc
+        ]]>
+    </select>
+
+    <select id="getResourceByName" resultType="com.winning.hmap.portal.auth.entity.SysResource">
+        <![CDATA[
+        SELECT
+            id,
+            parent_id,
+            `name`,
+            `code`,
+            icon,
+            url,
+            sort_by
+        FROM
+            sys_resource
+        WHERE `name` = #{name,jdbcType=VARCHAR} and del_flag = '0'
+        ]]>
+    </select>
+
+    <select id="findAllFuncPermissionPage" resultType="com.winning.hmap.portal.auth.entity.SysResource">
+        <![CDATA[
+        SELECT
+            id,
+            parent_id as "parentId",
+            `name`,
+            `code`,
+            icon,
+            url,
+            sort_by as "sortBy"
+        FROM
+            sys_resource
+        where del_flag = '0'
+        ORDER BY sortBy asc
+        ]]>
+    </select>
+
+    <update id="disable">
+        update sys_resource
+        set del_flag = '1'
+        <where>
+            id IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </update>
+
+    <update id="enable">
+        update sys_resource
+        set del_flag = '0'
+        <where>
+            id IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </update>
+
+</mapper>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.dict.mapper.SysDictMapper">
+
+    <insert id="insert" parameterType="com.winning.hmap.portal.dict.entity.SysDict">
+        insert into sys_dict (id, parent_id, dict_name, dict_code, dict_value, dict_type,sort_by,remark,
+          del_flag, crte_time, crter_id,updt_time, updtr_id)
+        values (#{id,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{dictName,jdbcType=VARCHAR},
+          #{dictCode,jdbcType=VARCHAR}, #{dictValue,jdbcType=VARCHAR}, #{dictType,jdbcType=BIT},
+          #{sortBy,jdbcType=INTEGER},#{remark,jdbcType=VARCHAR},
+          #{delFlag,jdbcType=CHAR}, #{crteTime,jdbcType=TIMESTAMP}, #{crterId,jdbcType=BIGINT},
+          #{updtTime,jdbcType=TIMESTAMP}, #{updtrId,jdbcType=BIGINT})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.dict.entity.SysDict">
+        update sys_dict
+        set parent_id = #{parentId,jdbcType=BIGINT},
+            dict_name = #{dictName,jdbcType=VARCHAR},
+            dict_code = #{dictCode,jdbcType=VARCHAR},
+            dict_value = #{dictValue,jdbcType=VARCHAR},
+            remark = #{remark,jdbcType=VARCHAR},
+            updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            updtr_id = #{updtrId,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="disable">
+        update sys_dict
+        set del_flag = '1'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="enable">
+        update sys_dict
+        set del_flag = '0'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="disableByIds">
+        update sys_dict
+        set del_flag = '1'
+        <where>
+            id IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </update>
+
+    <update id="enableByIds">
+        update sys_dict
+        set del_flag = '0'
+        <where>
+            id IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </update>
+
+    <select id="selectByPage">
+        <![CDATA[
+        SELECT
+            id,
+            parent_id,
+            dict_name,
+            dict_code,
+            dict_value,
+            dict_type,
+            sort_by,
+            remark,
+            del_flag
+        FROM
+            sys_dict
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.parentId != null and paramObj.parentId != ''">
+                    parent_id like concat('%',#{paramObj.parentId},'%')
+                </if>
+                <if test="paramObj.dictName != null and paramObj.dictName != ''">
+                    dict_name like concat('%',#{paramObj.dictName},'%')
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findDirList" parameterType="com.winning.hmap.portal.dict.dto.req.query.DictParam" resultType="com.winning.hmap.portal.dict.entity.SysDict">
+        <![CDATA[
+        SELECT
+            a.id,
+            a.parent_id,
+            b.dict_name parent_name,
+            a.dict_name,
+            a.dict_code,
+            a.dict_value,
+            a.dict_type,
+            a.sort_by,
+            a.remark,
+            a.del_flag
+        FROM
+            sys_dict a left join sys_dict b on a.parent_id = b.id
+        ]]>
+        <where>
+                AND a.dict_type = 1
+            <if test="parentId != null and parentId != ''">
+                AND a.parent_id = #{parentId}
+            </if>
+            <if test="dictName != null and dictName != ''">
+                AND a.dict_name like concat('%',#{dictName},'%')
+            </if>
+        </where>
+        ORDER BY a.sort_by asc
+
+    </select>
+
+    <select id="getDictByCode" resultType="com.winning.hmap.portal.dict.entity.SysDict">
+        <![CDATA[
+        SELECT
+            id,
+            parent_id,
+            dict_name,
+            dict_code,
+            dict_value,
+            dict_type,
+            sort_by,
+            remark,
+            del_flag
+        FROM
+            sys_dict
+        WHERE dict_code = #{dictCode,jdbcType=VARCHAR}
+        ]]>
+    </select>
+
+    <select id="getDictById" resultType="com.winning.hmap.portal.dict.entity.SysDict">
+        <![CDATA[
+        SELECT
+            a.id,
+            b.dict_name parent_name,
+            a.dict_name,
+            a.dict_code,
+            a.dict_value,
+            a.dict_type,
+            a.sort_by,
+            a.remark,
+            a.del_flag
+        FROM
+            sys_dict a inner join sys_dict b on a.parent_id = b.id
+        WHERE a.id = #{id,jdbcType=BIGINT}
+        ]]>
+    </select>
+
+
+    <select id="getDictListByParentDictCode" resultType="com.winning.hmap.portal.dict.entity.SysDict">
+        <![CDATA[
+        SELECT
+            children.id,
+            children.parent_id,
+            children.dict_name,
+            children.dict_code,
+            children.dict_value,
+            children.dict_type,
+            children.sort_by,
+            children.remark,
+            children.del_flag,
+            parent.dict_name parent_name
+        FROM
+            sys_dict children INNER JOIN sys_dict parent on children.parent_id = parent.id
+        WHERE parent.dict_code = #{dictCode,jdbcType=VARCHAR} and children.del_flag = "0"
+        ]]>
+    </select>
+
+    <select id="getDictList" resultType="com.winning.hmap.portal.dict.entity.SysDict">
+        <![CDATA[
+        SELECT
+            children.id,
+            children.parent_id,
+            parent.dict_code parent_code,
+            children.dict_name label,
+            children.dict_code,
+            children.dict_value code,
+            children.dict_type,
+            children.sort_by,
+            children.remark,
+            children.del_flag
+        FROM
+            sys_dict children INNER JOIN sys_dict parent on children.parent_id = parent.id
+        ]]>
+    </select>
+
+    <insert id="insertOperationLog" >
+        insert into sys_dict_log_tbl (opt_type,opter,opt_time,opt_content) values
+        (#{optType,jdbcType=VARCHAR},#{opter,jdbcType=VARCHAR},sysdate(),#{optContent,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="queryDictLogByPage">
+        <![CDATA[
+        select
+        id,
+        CASE WHEN opt_type = '1' THEN '新增'
+        WHEN opt_type = '2' THEN '编辑'
+        WHEN opt_type = '3' THEN '删除' ELSE '' END  as opt_type,
+        opter,
+        opt_content,
+        date_format(opt_time, '%Y-%m-%d %T') as opt_time
+        FROM
+        sys_dict_log_tbl
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.startDate!=null and paramObj.startDate!=''">
+                    and opt_time &gt;= str_to_date(#{paramObj.startDate},'%Y-%m-%d')
+                </if>
+                <if test="paramObj.endDate!=null and paramObj.endDate!=''">
+                    and opt_time &lt; date_add(str_to_date(#{paramObj.endDate},'%Y-%m-%d'),interval 1 day)
+                </if>
+                <if test="paramObj.opter!=null and paramObj.opter!=''">
+                    AND opter like '%${paramObj.opter}%'
+                </if>
+                <if test="paramObj.optType!=null and paramObj.optType!=''">
+                    AND opt_type = #{paramObj.optType}
+                </if>
+            </if>
+        </where>
+        order by opt_time desc
+    </select>
+
+
+
+</mapper>

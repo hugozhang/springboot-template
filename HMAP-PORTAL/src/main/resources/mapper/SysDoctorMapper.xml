@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winning.hmap.portal.auth.mapper.SysDoctorMapper">
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.winning.hmap.portal.auth.entity.SysDoctor" useGeneratedKeys="true">
+        insert into sys_doctor (id, dr_name, dr_code,hi_dr_name, hi_dr_code,
+                                duty_code, duty_name, tel,
+                                email, del_flag, crte_time,
+                                crter_id, updt_time, updtr_id
+        )
+        values (#{id,jdbcType=BIGINT}, #{drName,jdbcType=VARCHAR}, #{drCode,jdbcType=VARCHAR},
+                #{hiDrName,jdbcType=VARCHAR}, #{hiDrCode,jdbcType=VARCHAR},
+                #{dutyCode,jdbcType=VARCHAR}, #{dutyName,jdbcType=VARCHAR}, #{tel,jdbcType=VARCHAR},
+                #{email,jdbcType=VARCHAR}, #{delFlag,jdbcType=CHAR}, #{crteTime,jdbcType=TIMESTAMP},
+                #{crterId,jdbcType=BIGINT}, #{updtTime,jdbcType=TIMESTAMP}, #{updtrId,jdbcType=BIGINT}
+               )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        update sys_doctor
+        <set>
+            <if test="drName != null">
+                dr_name = #{drName,jdbcType=VARCHAR},
+            </if>
+            <if test="drCode != null">
+                dr_code = #{drCode,jdbcType=VARCHAR},
+            </if>
+            <if test="hiDrName != null">
+                hi_dr_name = #{hiDrName,jdbcType=VARCHAR},
+            </if>
+            <if test="hiDrCode != null">
+                hi_dr_code = #{hiDrCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dutyCode != null">
+                duty_code = #{dutyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="dutyName != null">
+                duty_name = #{dutyName,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null">
+                tel = #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=CHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crterId != null">
+                crter_id = #{crterId,jdbcType=BIGINT},
+            </if>
+            <if test="updtTime != null">
+                updt_time = #{updtTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updtrId != null">
+                updtr_id = #{updtrId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="getDoctorById" resultType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        <![CDATA[
+        SELECT
+            a.id,
+            a.dr_code,
+            a.dr_name,
+            a.hi_dr_code,
+            a.hi_dr_name,
+            a.duty_code,
+            a.duty_name,
+            a.tel,
+            a.crte_time,
+            a.email
+        FROM
+            sys_doctor a
+        WHERE a.id = #{drId,jdbcType=BIGINT}
+        ]]>
+    </select>
+
+    <select id="getDoctorByName" resultType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        <![CDATA[
+        SELECT
+            a.id,
+            a.dr_code,
+            a.dr_name,
+            a.hi_dr_code,
+            a.hi_dr_name,
+            a.duty_code,
+            a.duty_name,
+            a.tel,
+            a.email,
+            a.crte_time
+        FROM
+            sys_doctor a
+        WHERE a.dr_name like concat('%',#{drName},'%')
+        ]]>
+    </select>
+
+    <select id="getDoctorByDrId" resultType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        <![CDATA[
+        SELECT
+            id,
+            dr_code,
+            dr_name,
+            hi_dr_code,
+            hi_dr_name
+        FROM
+            sys_doctor
+        WHERE dr_code = #{drCode}
+        ]]>
+    </select>
+
+    <select id="getDoctorByCode" resultType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        <![CDATA[
+        SELECT
+            id,
+            dr_code,
+            dr_name
+        FROM
+            sys_doctor
+        WHERE dr_code = #{drCode}
+        ]]>
+    </select>
+
+    <select id="selectByPage" resultType="com.winning.hmap.portal.auth.dto.auth.resp.Doctor">
+        <![CDATA[
+        SELECT distinct
+            a.id dr_id,
+            a.dr_code,
+            a.dr_name,
+            a.hi_dr_code,
+            a.hi_dr_name,
+            a.del_flag,
+            a.duty_code,
+            a.tel,
+            a.email
+        FROM
+            sys_doctor a
+            LEFT JOIN sys_medins_dept_doctor b ON a.id = b.dr_id
+            INNER JOIN sys_medins_dept d on b.medins_dept_id = d.id
+        ]]>
+        <where>
+            <if test="paramObj != null">
+                <if test="paramObj.hiDrName != null and paramObj.hiDrName != ''">
+                   and (a.hi_dr_name like concat('%',#{paramObj.hiDrName},'%') or a.hi_dr_code like concat('%',#{paramObj.hiDrName},'%'))
+                </if>
+                <if test="paramObj.deptName != null">
+                   and d.dept_name like concat('%',#{paramObj.deptName},'%')
+                </if>
+                <if test="paramObj.delFlag != null and paramObj.delFlag != ''">
+                    and a.del_flag = #{paramObj.delFlag}
+                </if>
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+    <select id="findDoctorList" parameterType="com.winning.hmap.portal.auth.dto.auth.req.query.DoctorParam"
+            resultType="com.winning.hmap.portal.auth.dto.auth.resp.Doctor">
+        <![CDATA[
+        SELECT
+            a.id dr_id,
+            a.dr_code,
+            a.dr_name,
+            a.hi_dr_code,
+            a.hi_dr_name
+        FROM
+            sys_doctor a
+            LEFT JOIN sys_medins_dept_doctor b ON a.id = b.dr_id
+        ]]>
+        <where>
+            <if test="drNameOrCode != null and drNameOrCode !=''">
+                and (dr_name like concat('%',#{drNameOrCode},'%') or dr_code like concat('%',#{drNameOrCode},'%'))
+            </if>
+            <if test="medinsDeptId != null">
+                and b.medins_dept_id = #{medinsDeptId}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryUserNotexit" resultType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        select
+            id,
+            dr_name,
+            dr_code
+        from sys_doctor
+            where id not in(
+            select s.dr_id from sys_user s
+            )
+    </select>
+
+    <update id="updateDoctorDtos" useGeneratedKeys="true" keyProperty="id">
+        <foreach collection="list" item="item" separator=";">
+            update sys_doctor
+            SET dr_name=#{item.drName},
+            hi_dr_code=#{item.hiDrCode},
+            hi_dr_name=#{item.hiDrName},
+            duty_code=#{item.dutyCode},
+            tel=#{item.tel},
+            email=#{item.email},
+            updt_time=#{item.updtTime},
+            updtr_id=#{item.updtrId}
+            where id=#{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteUserDeptByList" parameterType="java.util.List">
+        delete from sys_medins_dept_doctor WHERE dr_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteMedicalTeams" parameterType="java.util.List">
+        delete from sys_doctor_med_grp WHERE dr_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="bindingDoctorDept">
+        insert into sys_medins_dept_doctor(dr_id,medins_dept_id,crte_time,crter_id)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{drId},#{item.id},#{item.crteTime},#{item.crterId})
+        </foreach>
+    </insert>
+
+    <insert id="bindingDoctorMedTeam">
+        insert into sys_doctor_med_grp(dr_id,med_grp_id,crte_time,updt_time)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{drId},#{item.medGrpId},now(),now())
+        </foreach>
+    </insert>
+
+    <insert id="insertDoctorList" parameterType="com.winning.hmap.portal.auth.entity.SysDoctor" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_doctor(dr_code,dr_name,hi_dr_code,hi_dr_name,duty_code,tel,email,crte_time,crter_id,del_flag) values
+        <foreach collection="list" item="item" open="(" close=")" separator="),(">
+            #{item.drCode},
+            #{item.drName},
+            #{item.hiDrCode},
+            #{item.hiDrName},
+            #{item.dutyCode},
+            #{item.tel},
+            #{item.email},
+            #{item.crteTime},
+            #{item.crterId},
+            #{item.delFlag}
+        </foreach>
+    </insert>
+
+    <select id="queryAllDoctor" resultType="com.winning.hmap.portal.auth.entity.SysDoctor">
+        SELECT
+            id,
+            dr_code
+        FROM
+            sys_doctor
+    </select>
+
+    <update id="disable">
+        update sys_doctor
+        set del_flag = '1'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="enable">
+        update sys_doctor
+        set del_flag = '0'
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="options" parameterType="com.winning.hmap.portal.auth.dto.auth.req.query.DoctorParam"
+            resultType="com.winning.hmap.portal.auth.dto.auth.resp.DoctorItem">
+        SELECT
+            dr_name name,
+            dr_code code
+        FROM
+            sys_doctor
+        <where>
+            <if test="drNameOrCode != null and drNameOrCode != ''">
+                AND (dr_name LIKE concat('%',#{drNameOrCode},'%') OR dr_code LIKE concat('%',#{drNameOrCode},'%'))
+            </if>
+            <if test="drCodes!=null and drCodes.size() > 0 ">
+                AND dr_code in (
+                <foreach collection="drCodes" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+    </select>
+</mapper>

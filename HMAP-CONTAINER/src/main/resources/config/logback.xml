@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="false">
+
+<!--    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="/data/log/"/>-->
+<!--    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hmap"/>-->
+        <property name="LOG_HOME" value="logs"/>
+        <property name="APP_NAME" value="hmap_web"/>
+        <property name="LOG_API_NAME" value="hmap-api-access"/>
+        <property name="APP_API_NAME" value="hmap_api_access"/>
+        <property name="LOG_COLLECTION_NAME" value="hmap-collection-access"/>
+        <property name="APP_COLLECTION_NAME" value="hmap_collection_access"/>
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%message：日志消息，%n是换行符-->
+            <!-- %d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n -->
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS}||[%magenta(%thread)]||%highlight(%-5level)||%yellow(%logger.%M) %line|| %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <!-- 按照每天生成日志文件 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/${APP_NAME}.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>7</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%message：日志消息，%n是换行符-->
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS}||[%thread]||%-5level||%logger.%M %line|| %msg%n
+            </pattern>
+        </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>50MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- 接口调用请求生成日志文件 -->
+    <appender name="FILE-COLLECTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/${LOG_COLLECTION_NAME}/${APP_COLLECTION_NAME}.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${LOG_COLLECTION_NAME}/${APP_COLLECTION_NAME}.%d{yyyy-MM-dd}-%i.log.gz</FileNamePattern>
+            <maxHistory>15</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}||[%thread]||%-5level||%logger.%M|| %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- 采集接口调用请求生成日志文件 -->
+    <appender name="FILE-REQUEST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/${LOG_API_NAME}/${APP_API_NAME}.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${LOG_API_NAME}/${APP_API_NAME}.%d{yyyy-MM-dd}-%i.log.gz</FileNamePattern>
+            <maxHistory>15</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}||[%thread]||%-5level||%logger.%M|| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.alibaba.druid.pool" level="OFF"> </logger>
+    <logger name="io.swagger.models.parameters" level="OFF"> </logger>
+    <logger name="org.springframework.beans" level="OFF"> </logger>
+    <logger name="io.lettuce.core" level="OFF"> </logger>
+    <logger name="org.springframework.data.redis" level="OFF"> </logger>
+
+<!--    <logger name="com.winning.hmap.portal.logger.support.CollectionLogAspect" level="info" additivity="false">-->
+<!--        <appender-ref ref="FILE-COLLECTION"/>-->
+<!--    </logger>-->
+
+    <logger name="com.winning.hmap.portal.logger.support.ApiLogAspect" level="info" additivity="false">
+        <appender-ref ref="FILE-REQUEST"/>
+    </logger>
+
+    <!-- 日志输出级别 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
